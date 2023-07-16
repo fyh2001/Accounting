@@ -1,0 +1,26 @@
+* {
+  /* @apply font-sans */
+
+  /* 去除button样式 */
+  -webkit-tap-highlight-color: transparent;
+  /* 不可复制 */
+  -webkit-touch-callout: none !important;
+  -webkit-user-select: none;
+}
+
+body {
+  min-height: 100vh;
+  background-color: #f1f4fb;
+  /* overflow-x: hidden */
+}
+
+/* 兼容ios输入 */
+* input, textarea {
+  -webkit-touch-callout: default !important;
+  -webkit-user-select: auto !important;
+  user-select: auto !important;
+}
+
+.theme-green{
+  --primary-color: #00c3b3;
+}
