@@ -1,10 +1,10 @@
 <template>
   <div>
     <!-- 顶部导航栏 -->
-    <NavBar>
+    <NavBar @exit="router.back()">
       <div class="text-4.5">添加交易</div>
       <template #right>
-        <n-icon :component="Check" :size="25" />
+        <n-icon :component="Check" :size="25" @click="submit" />
       </template>
     </NavBar>
 
@@ -18,7 +18,7 @@
         :button-text-color="'#bfc2c7'"
       />
       <!-- 金额设置 -->
-      <MoneyEditBox v-model="formData.money" />
+      <MoneyEditBox :value="moneyEditBoxValue" @click="calculatorShow = true" />
       <!-- 用途分类 -->
       <RadioButtonGroup
         v-model="formData.use_classification"
@@ -33,11 +33,7 @@
       <!-- 日期时间选择 -->
       <div class="grid grid-cols-2 gap-4">
         <n-date-picker v-model:value="formData.date" type="date" />
-        <n-time-picker
-          :default-value="formData.date"
-          placement="top-start"
-          format="HH:mm"
-        />
+        <n-time-picker :default-value="formData.date" format="HH:mm" />
       </div>
       <!-- 备注 -->
       <div>
@@ -52,11 +48,18 @@
     </div>
 
     <!-- 保存 -->
-    <div class="absolute bottom-5 px-6 w-full h-12">
-        <n-button class="w-full h-full" color="#00c3b3" strong round >
-      保存
-    </n-button>
+    <div class="fixed bottom-5 px-6 w-full h-12" @click="submit">
+      <n-button class="w-full h-full" color="#00c3b3" strong round>
+        保存
+      </n-button>
     </div>
+
+    <!-- 计算器 -->
+    <Calculator
+      v-model:value="formData.money"
+      :show="calculatorShow"
+      @close="calculatorShow = false"
+    />
   </div>
 </template>
 
@@ -65,8 +68,14 @@ import NavBar from "../../components/NavBar.vue";
 import Check from "@vicons/tabler/Check";
 import RadioButtonGroup from "../../components/RadioButtonGroup.vue";
 import MoneyEditBox from "../../components/MoneyEditBox.vue";
+import Calculator from "../../components/Calculator.vue";
 import time from "../../utils/timeHandler";
+import router from "../../router/router";
+import { v4 as uuidv4 } from "uuid";
+import { useAccountStore } from "../../store/accountStore";
 import { onMounted, ref } from "vue";
+
+const accountStore = useAccountStore();
 
 // 账单分类
 const account_classification = [
@@ -122,14 +131,48 @@ const use_classification = [
 
 // 表单数据
 const formData = ref({
+  user_id: 1,
   account_classification: "expenditure",
   use_classification: "买菜",
-  money: "",
+  money: "0",
   date: time.getUnix(),
   remark: "",
+  create_time: time.getUnix(),
+  update_time: time.getUnix(),
 });
 
+/**
+ * 提交表单
+ */
+const submit = () => {
+  formData.value.id = uuidv4(); // 生成随机id
+
+  formData.value.money = parseFloat(formData.value.money); // 将金额转换为浮点数
+
+  const res = accountStore.addAccount(formData.value); // 添加账单
+
+  // 添加成功
+  if (res === 200) {
+    window.$message.success("添加成功");
+    router.back(); // 返回上一页
+  }
+};
+
+// 计算器显示
+const calculatorShow = ref(false);
+
+// 监听金额输入框的值
+const moneyEditBoxValue = ref("0");
+watch(
+  () => formData.value.money,
+  (newVal, oldVal) => {
+    moneyEditBoxValue.value =
+      Number(newVal) + "" != NaN + "" ? newVal : moneyEditBoxValue.value; // 如果输入的值不是数字，则不改变输入框的值
+  }
+);
 onMounted(() => {
+  // navHeight.value = getStatusBarHeight();
+
   // 设置日期选择器和时间选择器的圆角
   document
     .getElementsByClassName("n-date-picker")[0]
@@ -151,6 +194,22 @@ onMounted(() => {
       true
     );
 });
+
+const navHeight = ref(0);
+/**
+ * 获得原生状态栏高度
+ */
+const getStatusBarHeight = () => {
+  var immersed = 0;
+  var ms = /Html5Plus\/.+\s\(.*(Immersed\/(\d+\.?\d*).*)\)/gi.exec(
+    navigator.userAgent
+  );
+  if (ms && ms.length >= 3) {
+    // 当前环境为沉浸式状态栏模式
+    immersed = parseFloat(ms[2]); // 获取状态栏的高度
+  }
+  return immersed;
+};
 </script>
 
 <style></style>

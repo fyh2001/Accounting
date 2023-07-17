@@ -5,7 +5,7 @@
   >
     <!-- Left -->
     <div class="flex items-center">
-      <n-icon class="mr-4" :component="ArrowLeft" :size="25" color="#fff" />
+      <n-icon class="mr-4" :component="ArrowLeft" :size="25" color="#fff" @click="emit('exit')"/>
       <div>
         <slot></slot>
       </div>
@@ -17,6 +17,9 @@
 
 <script setup>
 import ArrowLeft from "@vicons/tabler/ArrowLeft";
+import router from "../router/router";
+
+const emit = defineEmits(["exit"])
 </script>
 
 <style></style>

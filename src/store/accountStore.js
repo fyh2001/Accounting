@@ -13,6 +13,10 @@ export const useAccountStore = defineStore("user", {
     monthlyIncomeTotal: {}, // 每个月的总收入金额
   }),
   getters: {
+    /**
+     * 获取最近7天的支出总数
+     * @returns 最近7天的支出总数
+     */
     weeklyExpenditureTotal() {
       const weeklyExpenditureTotal = {};
 
@@ -109,5 +113,36 @@ export const useAccountStore = defineStore("user", {
       this.monthlyExpenditureTotal = monthlyExpenditureTotal;
       this.monthlyIncomeTotal = monthlyIncomeTotal;
     },
+
+    /**
+     * 添加账单
+     * @param {*} account 账单
+     */
+    addAccount(account) {
+      this.accountList.push(account);
+
+      // 如果列表中的最后一个账单不是最新的账单，说明添加失败
+      if(account.id !== this.accountList.slice(-1)[0].id) {
+        return -1;
+      }
+
+      this.updateExpenditureAndIncome();
+      this.calculateMonthlyExpenditureTotalAndIncomeTotal();
+      this.calculateDailyExpenditureTotalAndIncomeTotal();
+
+      return 200;
+    },
+
+    /**
+     * 批量添加账单
+     * @param {*} accounts 账单数组
+     */
+    addAccounts(accounts) {
+      this.accountList = [...this.accountList, ...accounts];
+      
+      this.updateExpenditureAndIncome();
+      this.calculateMonthlyExpenditureTotalAndIncomeTotal();
+      this.calculateDailyExpenditureTotalAndIncomeTotal();
+    }
   },
 });

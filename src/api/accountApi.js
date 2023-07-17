@@ -17,6 +17,19 @@ export default {
   },
 
   /**
+   * 批量上传账单
+   * @param {*} accounts 账单列表
+   * @returns 上传结果
+   */
+  uploadAccounts(accounts) {
+    return request({
+      method: "POST",
+      url: `${this.baseURL}/uploadAccounts`,
+      data: accounts,
+    });
+  },
+
+  /**
    * 查询所有账单
    * @returns 账单列表
    */
@@ -24,6 +37,18 @@ export default {
     return request({
       method: "GET",
       url: `${this.baseURL}/getAllAccount`,
+    })
+  },
+
+  /**
+   * 获取增量数据
+   * @param {*} timestamp 时间戳
+   * @returns 增量数据
+   */
+  getAdditionalData(timestamp){
+    return request({
+      method: "GET",
+      url: `${this.baseURL}/getAdditionalData/${timestamp}`,
     })
   }
 };
