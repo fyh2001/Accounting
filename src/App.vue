@@ -5,7 +5,6 @@
       class="w-full z-999"
       :style="{ height: navHeight + 'px', backgroundColor: '#00c3b3' }"
     />
-
     <router-view v-slot="{ Component }">
       <transition name="fade" mode="out-in">
         <component :is="Component" />
@@ -32,6 +31,7 @@ const getStatusBarHeight = () => {
   }
   return immersed;
 };
+
 
 const navHeight = ref(0);
 
